@@ -1,0 +1,10 @@
+/target
+/.idea
+/instance-src
+/.buildpath
+/.project
+/.settings
+/build.properties
+/doc/build
+# the apple directory description
+.DS_Store
