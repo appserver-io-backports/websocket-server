@@ -87,7 +87,7 @@ class HandlerManager
         if (is_dir($folder = $this->getWebappPath())) {
 
             // it's no valid application without at least the handler.xml file
-            if (file_exists($web = $folder . DIRECTORY_SEPARATOR . 'WEB-INF' . DIRECTORY_SEPARATOR . 'handler.xml')) {
+            if (!file_exists($web = $folder . DIRECTORY_SEPARATOR . 'WEB-INF' . DIRECTORY_SEPARATOR . 'handler.xml')) {
                 return;
             }
 

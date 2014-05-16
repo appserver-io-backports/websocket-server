@@ -67,7 +67,7 @@ class AsyncSocket extends IoServer
      *
      * @return void
      */
-    protected function __construct(MessageComponentInterface $app, $port, $address)
+    public function __construct(MessageComponentInterface $app, $port, $address)
     {
 
         // initialize event loop and socket

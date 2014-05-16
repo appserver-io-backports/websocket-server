@@ -119,9 +119,8 @@ class AsyncServer extends \Thread implements ServerInterface
                 throw new ConnectionHandlerNotFoundException($connectionHandlerType);
             }
             // instantiate connection handler type
-            $connectionHandler = new $connectionHandlerType(
-            	$serverContext->getContainer()->getApplications()
-			);
+            $applications = $serverContext->getContainer()->getApplications();
+            $connectionHandler = new $connectionHandlerType($applications);
 
             $logger->debug(
                 sprintf("%s init connectionHandler (%s)", $serverName, $connectionHandlerType)
