@@ -22,8 +22,7 @@
 namespace TechDivision\WebSocketServer;
 
 use TechDivision\WebSocketProtocol\Request;
-use TechDivision\WebSocketServer\HandlerManager;
-use TechDivision\WebSocketServer\HandlerNotFoundException;
+use TechDivision\WebSocketProtocol\HandlerContext;
 
 /**
  * The handler resource locator implementation.
@@ -42,22 +41,22 @@ class HandlerLocator implements ResourceLocatorInterface
     /**
      * Tries to locate the handler that handles the request and returns the instance if one can be found.
      *
-     * @param \TechDivision\WebSocketServer\HandlerManager $handlerManager The handler manager
-     * @param \TechDivision\WebSocketProtocol\Request      $request        The request instance
+     * @param \TechDivision\WebSocketProtocol\HandlerContext $handlerManager The handler manager
+     * @param \TechDivision\WebSocketProtocol\Request        $request        The request instance
      *
      * @return \Ratchet\MessageComponentInterface The handler that maps the request instance
      * @see \TechDivision\WebSocketServer\Service\Locator\ResourceLocatorInterface::locate()
      */
-    public function locate(HandlerManager $handlerManager, Request $request)
+    public function locate(HandlerContext $handlerManager, Request $request)
     {
 
         // load the path to the (almost virtual handler)
         $handlerPath = $request->getHandlerPath();
 
         // iterate over all handlers and return the matching one
-        foreach ($handlerManager->getHandler() as $urlPattern => $handlerName) {
+        foreach ($handlerManager->getHandlers() as $urlPattern => $handler) {
             if (fnmatch($urlPattern, $handlerPath)) {
-                return $handlerManager->getHandler($handlerName);
+                return $handler;
             }
         }
 

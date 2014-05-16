@@ -144,6 +144,7 @@ class AsyncServer extends \Thread implements ServerInterface
        		$connectionHandler, $serverConfig->getPort(), $serverConfig->getAddress()
         );
 
+
         $logger->info(
             sprintf("%s listing on %s:%s...", $serverName, $serverConfig->getAddress(), $serverConfig->getPort())
         );

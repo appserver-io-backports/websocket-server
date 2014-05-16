@@ -22,7 +22,8 @@
 
 namespace TechDivision\WebSocketServer;
 
-use Guzzle\Http\Message\RequestInterface;
+use TechDivision\WebSocketProtocol\Request;
+use TechDivision\WebSocketProtocol\HandlerContext;
 
 /**
  * Interface for the resource locator instances.
@@ -41,10 +42,10 @@ interface ResourceLocatorInterface
     /**
      * Tries to locate the handler that handles the request and returns the instance if one can be found.
      *
-     * @param \TechDivision\WebSocketServer\HandlerManager $handlerManager The handler manager
-     * @param \Guzzle\Http\Message\RequestInterface $request The request instance
+     * @param \TechDivision\WebSocketProtocol\HandlerContext $handlerManager The handler manager
+     * @param \TechDivision\WebSocketProtocol\Request        $request        The request instance
      *
      * @return \Ratchet\MessageComponentInterface The handler that maps the request instance
      */
-    public function locate(HandlerManager $handlerManager, RequestInterface $request);
+    public function locate(HandlerContext $handlerManager, Request $request);
 }

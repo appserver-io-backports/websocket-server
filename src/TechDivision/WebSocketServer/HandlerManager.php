@@ -22,6 +22,7 @@
 namespace TechDivision\WebSocketServer;
 
 use Ratchet\MessageComponentInterface;
+use TechDivision\WebSocketProtocol\HandlerContext;
 use TechDivision\WebContainer\Exceptions\InvalidApplicationArchiveException;
 
 /**
@@ -35,14 +36,15 @@ use TechDivision\WebContainer\Exceptions\InvalidApplicationArchiveException;
  * @link      https://github.com/techdivision/TechDivision_WebSocketServer
  * @link      http://www.appserver.io
  */
-class HandlerManager
+class HandlerManager implements HandlerContext
 {
 
     /**
+     * Array with web socket handlers handled by this manager.
      *
      * @var array
      */
-    protected $handler = array();
+    protected $handlers = array();
 
     /**
      * The absolute path to the web application.
@@ -123,21 +125,25 @@ class HandlerManager
     }
 
     /**
+     * Sets the handlers handled by this manager.
      *
-     * @param array $handler
+     * @param array $handlers The handlers
+     *
+     * @return void
      */
-    public function setHandler($handler)
+    public function setHandlers($handlers)
     {
-        $this->handler = $handler;
+        $this->handlers = $handlers;
     }
 
     /**
+     * Returns the handlers handled by this manager.
      *
      * @return array An array with the initialized web socket handlers
      */
-    public function getHandler()
+    public function getHandlers()
     {
-        return $this->handler;
+        return $this->handlers;
     }
 
     /**
@@ -150,7 +156,21 @@ class HandlerManager
      */
     public function addHandler($key, MessageComponentInterface $handler)
     {
-        $this->handler[$key] = $handler;
+        $this->handlers[$key] = $handler;
+    }
+
+    /**
+     * Returns the registered handlers.
+     *
+     * @param string $key The key the handler to be returned has been registered with.
+     *
+     * @return \Ratchet\MessageComponentInterface The requested handler
+     */
+    public function getHandler($key)
+    {
+    	if (isset($this->handlers[$key])) {
+    		return $this->handlers[$key];
+    	}
     }
 
     /**
