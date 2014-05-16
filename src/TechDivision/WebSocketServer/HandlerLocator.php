@@ -21,7 +21,7 @@
  */
 namespace TechDivision\WebSocketServer;
 
-use Guzzle\Http\Message\RequestInterface;
+use TechDivision\WebSocketProtocol\Request;
 use TechDivision\WebSocketServer\HandlerManager;
 use TechDivision\WebSocketServer\HandlerNotFoundException;
 
@@ -43,26 +43,26 @@ class HandlerLocator implements ResourceLocatorInterface
      * Tries to locate the handler that handles the request and returns the instance if one can be found.
      *
      * @param \TechDivision\WebSocketServer\HandlerManager $handlerManager The handler manager
-     * @param \Guzzle\Http\Message\RequestInterface $request The request instance
+     * @param \TechDivision\WebSocketProtocol\Request      $request        The request instance
      *
      * @return \Ratchet\MessageComponentInterface The handler that maps the request instance
      * @see \TechDivision\WebSocketServer\Service\Locator\ResourceLocatorInterface::locate()
      */
-    public function locate(HandlerManager $handlerManager, RequestInterface $request)
+    public function locate(HandlerManager $handlerManager, Request $request)
     {
 
         // load the path to the (almost virtual handler)
-        $handlerPath = $request->getPath();
+        $handlerPath = $request->getHandlerPath();
 
         // iterate over all handlers and return the matching one
-        foreach ($this->getHandlerManager()->getHandler() as $urlPattern => $handlerName) {
+        foreach ($handlerManager->getHandler() as $urlPattern => $handlerName) {
             if (fnmatch($urlPattern, $handlerPath)) {
                 return $handlerManager->getHandler($handlerName);
             }
         }
 
         // throw an exception if no servlet matches the handler path
-        throw new HandlertNotFoundException(
+        throw new HandlerNotFoundException(
             sprintf("Can't find handler for requested path %s", $handlerPath)
         );
     }
