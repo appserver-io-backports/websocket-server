@@ -43,27 +43,26 @@ use Ratchet\MessageComponentInterface;
 class AsyncSocket extends IoServer
 {
 
-
-	/**
+    /**
      * Factory method to create a new socket instance.
      *
-     * @param MessageComponentInterface $app The request handler instance
-     * @param integer 				 	$port The port to listen to
-     * @param string 					$address The IP address to listen to
+     * @param MessageComponentInterface $app     The request handler instance
+     * @param integer                   $port    The port to listen to
+     * @param string                    $address The IP address to listen to
      *
      * @return \TechDivision\WebSocketServer\Sockets\AsyncSocket The socket instance
      */
-	public static function getServerInstance(MessageComponentInterface $app, $port = 80, $address = '0.0.0.0')
-	{
-		return new AsyncSocket($app, $port, $address);
-	}
+    public static function getServerInstance(MessageComponentInterface $app, $port = 80, $address = '0.0.0.0')
+    {
+        return new AsyncSocket($app, $port, $address);
+    }
 
     /**
      * Constructor to initialize the socket instance.
      *
-     * @param MessageComponentInterface $app The request handler instance
-     * @param integer 				 	$port The port to listen to
-     * @param string 					$address The IP address to listen to
+     * @param MessageComponentInterface $app     The request handler instance
+     * @param integer                   $port    The port to listen to
+     * @param string                    $address The IP address to listen to
      *
      * @return void
      */

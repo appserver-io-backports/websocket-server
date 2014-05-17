@@ -1,7 +1,7 @@
 <?php
 
 /**
- * TechDivision\WebSocketServer\ResourceLocatorInterface
+ * TechDivision\WebSocketServer\InvalidHandlerMappingException
  *
  * NOTICE OF LICENSE
  *
@@ -22,11 +22,9 @@
 
 namespace TechDivision\WebSocketServer;
 
-use TechDivision\WebSocketProtocol\Request;
-use TechDivision\WebSocketProtocol\HandlerContext;
-
 /**
- * Interface for the resource locator instances.
+ * Is thrown if a invalid handler mapping has been found in the
+ * handler configuration.
  *
  * @category  Library
  * @package   TechDivision_WebSocketServer
@@ -36,16 +34,6 @@ use TechDivision\WebSocketProtocol\HandlerContext;
  * @link      https://github.com/techdivision/TechDivision_WebSocketServer
  * @link      http://www.appserver.io
  */
-interface ResourceLocatorInterface
+class InvalidHandlerMappingException extends \Exception
 {
-
-    /**
-     * Tries to locate the handler that handles the request and returns the instance if one can be found.
-     *
-     * @param \TechDivision\WebSocketProtocol\HandlerContext $handlerManager The handler manager
-     * @param \TechDivision\WebSocketProtocol\Request        $request        The request instance
-     *
-     * @return \Ratchet\MessageComponentInterface The handler that maps the request instance
-     */
-    public function locate(HandlerContext $handlerManager, Request $request);
 }
