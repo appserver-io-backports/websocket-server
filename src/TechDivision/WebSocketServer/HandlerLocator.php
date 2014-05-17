@@ -54,9 +54,9 @@ class HandlerLocator implements ResourceLocatorInterface
         $handlerPath = $request->getHandlerPath();
 
         // iterate over all handlers and return the matching one
-        foreach ($handlerManager->getHandlers() as $urlPattern => $handler) {
+        foreach ($handlerManager->getHandlerMappings() as $urlPattern => $handlerName) {
             if (fnmatch($urlPattern, $handlerPath)) {
-                return $handler;
+                return $handlerManager->getHandler($handlerName);
             }
         }
 

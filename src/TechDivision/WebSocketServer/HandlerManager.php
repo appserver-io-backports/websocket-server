@@ -23,6 +23,7 @@
 namespace TechDivision\WebSocketServer;
 
 use Ratchet\MessageComponentInterface;
+use TechDivision\WebSocketProtocol\Handler;
 use TechDivision\WebSocketProtocol\HandlerContext;
 use TechDivision\WebContainer\Exceptions\InvalidApplicationArchiveException;
 
@@ -48,11 +49,25 @@ class HandlerManager implements HandlerContext
     protected $handlers = array();
 
     /**
+     * Array that contains the handler mappings
+     *
+     * @var array
+     */
+    protected $handlerMappings = array();
+
+    /**
      * The absolute path to the web application.
      *
      * @var string
      */
     protected $webappPath;
+
+    /**
+     * Array with the handler's init parameters found in the handler.xml configuration file.
+     *
+     * @var array
+    */
+    protected $initParameter = array();
 
     /**
      * Injects the absolute path to the web application.
@@ -82,6 +97,8 @@ class HandlerManager implements HandlerContext
      * Finds all handlers which are provided by the webapps and initializes them.
      *
      * @return void
+     * @throws \TechDivision\WebSocketContainer\InvalidHandlerClassException Is thrown if a no handler class has been defined in handler configuration
+     * @throws \TechDivision\WebSocketContainer\InvalidHandlerMappingException Is thrown if a no handler mapping relates to a invalid handler class
      */
     protected function registerHandlers()
     {
@@ -89,7 +106,7 @@ class HandlerManager implements HandlerContext
         // the phar files have been deployed into folders
         if (is_dir($folder = $this->getWebappPath())) {
 
-            // it's no valid application without at least the handler.xml file
+            // it's no valid application without at least the web.xml file
             if (!file_exists($web = $folder . DIRECTORY_SEPARATOR . 'WEB-INF' . DIRECTORY_SEPARATOR . 'handler.xml')) {
                 return;
             }
@@ -97,48 +114,82 @@ class HandlerManager implements HandlerContext
             // load the application config
             $config = new \SimpleXMLElement(file_get_contents($web));
 
-            /**
-             *
-             * @var $mapping \SimpleXMLElement
-             */
-            foreach ($config->xpath('/web-app/handler-mapping') as $mapping) {
+            // initialize the context by parsing the context-param nodes
+            foreach ($config->xpath('/web-app/context-param') as $contextParam) {
+                $this->addInitParameter((string) $contextParam->{'param-name'}, (string) $contextParam->{'param-value'});
+            }
 
-                // try to resolve the mapped handler class
-                $className = $config->xpath('/web-app/handler[handler-name="' . $mapping->{'handler-name'} . '"]/handler-class');
+            // initialize the handlers by parsing the handler-mapping nodes
+            foreach ($config->xpath('/web-app/handler') as $handler) {
 
-                if (count($className) === false) {
-                    throw new InvalidApplicationArchiveException(sprintf('No handler class defined for handler %s', $mapping->{'handler-name'}));
+                // load the handler name and check if it already has been initialized
+                $handlerName = (string) $handler->{'handler-name'};
+                if (array_key_exists($handlerName, $this->handlers)) {
+                    continue;
                 }
 
-                // get the string classname
-                $className = (string) array_shift($className);
+                // try to resolve the mapped handler class
+                $className = (string) $handler->{'handler-class'};
+                if (!count($className)) {
+                    throw new InvalidHandlerClassException(sprintf('No handler class defined for handler %s', $handler->{'handler-class'}));
+                }
 
                 // instantiate the handler
-                $handler = new $className();
+                $instance = new $className();
 
-                // load the url pattern
-                $urlPattern = (string) $mapping->{'url-pattern'};
+                // initialize the handler configuration
+                $handlerConfig = new HandlerConfiguration();
+                $handlerConfig->injectHandlerContext($this);
+                $handlerConfig->injectHandlerName($handlerName);
+                $handlerConfig->injectWebappPath($this->getWebappPath());
+
+                // append the init params to the handler configuration
+                foreach ($handler->{'init-param'} as $initParam) {
+                    $handlerConfig->addInitParameter((string) $initParam->{'param-name'}, (string) $initParam->{'param-value'});
+                }
+
+                // initialize the handler
+                $instance->init($handlerConfig);
 
                 // the handler is added to the dictionary using the complete request path as the key
-                $this->addHandler($urlPattern, $handler);
+                $this->addHandler($handlerName, $instance);
+            }
+
+            // initialize the handlers by parsing the handler-mapping nodes
+            foreach ($config->xpath('/web-app/handler-mapping') as $mapping) {
+
+                // load the url pattern and the handler name
+                $urlPattern = (string) $mapping->{'url-pattern'};
+                $handlerName = (string) $mapping->{'handler-name'};
+
+                // make sure that the URL pattern always starts with a leading slash
+                $urlPattern = ltrim($urlPattern, '/');
+
+                // the handler is added to the dictionary using the complete request path as the key
+                if (!array_key_exists($handlerName, $this->handlers)) {
+                    throw new InvalidHandlerMappingException(sprintf("Can't find handler %s for url-pattern %s", $handlerName, $urlPattern));
+                }
+
+                // append the url-pattern - handler mapping to the array
+                $this->handlerMappings['/' . $urlPattern] = (string) $mapping->{'handler-name'};
             }
         }
     }
 
     /**
-     * Sets the handlers handled by this manager.
+     * Set's the array with all registered handlers.
      *
-     * @param array $handlers The handlers
+     * @param array $handler An array with the web socket handlers to be registered
      *
      * @return void
      */
-    public function setHandlers($handlers)
+    public function setHandlers($handler)
     {
-        $this->handlers = $handlers;
+        $this->handlers = $handler;
     }
 
     /**
-     * Returns the handlers handled by this manager.
+     * Return's the array with all registered handlers.
      *
      * @return array An array with the initialized web socket handlers
      */
@@ -150,27 +201,65 @@ class HandlerManager implements HandlerContext
     /**
      * Registers a handler under the passed key.
      *
-     * @param string                             $key     The handler to key to register with
-     * @param \Ratchet\MessageComponentInterface $handler The handler to be registered
+     * @param string                                            $key     The key to register with the handler with
+     * @param \TechDivision\WebSocketContainer\Handlers\Handler $handler The handler to be registered
      *
      * @return void
      */
-    public function addHandler($key, MessageComponentInterface $handler)
+    public function addHandler($key, Handler $handler)
     {
         $this->handlers[$key] = $handler;
     }
 
     /**
-     * Returns the registered handlers.
+     * Returns the handler mappings found in the
+     * configuration file.
      *
-     * @param string $key The key the handler to be returned has been registered with.
+     * @return array The handler mappings
+     */
+    public function getHandlerMappings()
+    {
+        return $this->handlerMappings;
+    }
+
+    /**
+     * Returns the handler for the passed name.
      *
-     * @return \Ratchet\MessageComponentInterface The requested handler
+     * @param string $key The name of the handler to return
+     *
+     * @return \TechDivision\WebSocktContainer\Handlers\Handler The handler instance
      */
     public function getHandler($key)
     {
-        if (isset($this->handlers[$key])) {
+        if (array_key_exists($key, $this->handlers)) {
             return $this->handlers[$key];
+        }
+    }
+
+    /**
+     * Register's the init parameter under the passed name.
+     *
+     * @param string $name  Name to register the init parameter with
+     * @param string $value The value of the init parameter
+     *
+     * @return void
+     */
+    public function addInitParameter($name, $value)
+    {
+        $this->initParameter[$name] = $value;
+    }
+
+    /**
+     * Return's the init parameter with the passed name.
+     *
+     * @param string $name Name of the init parameter to return
+     *
+     * @return string The requested parameter
+     */
+    public function getInitParameter($name)
+    {
+        if (array_key_exists($name, $this->initParameter)) {
+            return $this->initParameter[$name];
         }
     }
 
@@ -182,15 +271,5 @@ class HandlerManager implements HandlerContext
     public function getWebappPath()
     {
         return $this->webappPath;
-    }
-
-    /**
-     * Returns the host configuration.
-     *
-     * @return \TechDivision\ApplicationServer\Configuration The host configuration
-     */
-    public function getConfiguration()
-    {
-        throw new \Exception(__METHOD__ . ' not implemented');
     }
 }
