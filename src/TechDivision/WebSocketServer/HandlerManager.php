@@ -19,6 +19,7 @@
  * @link      https://github.com/techdivision/TechDivision_WebSocketServer
  * @link      http://www.appserver.io
  */
+
 namespace TechDivision\WebSocketServer;
 
 use Ratchet\MessageComponentInterface;
@@ -149,10 +150,10 @@ class HandlerManager implements HandlerContext
     /**
      * Registers a handler under the passed key.
      *
-     * @param string $key
-     *            The handler to key to register with
-     * @param \Ratchet\MessageComponentInterface $handler
-     *            The handler to be registered
+     * @param string                             $key     The handler to key to register with
+     * @param \Ratchet\MessageComponentInterface $handler The handler to be registered
+     *
+     * @return void
      */
     public function addHandler($key, MessageComponentInterface $handler)
     {
@@ -168,9 +169,9 @@ class HandlerManager implements HandlerContext
      */
     public function getHandler($key)
     {
-    	if (isset($this->handlers[$key])) {
-    		return $this->handlers[$key];
-    	}
+        if (isset($this->handlers[$key])) {
+            return $this->handlers[$key];
+        }
     }
 
     /**

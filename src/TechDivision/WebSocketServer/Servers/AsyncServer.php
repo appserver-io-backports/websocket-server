@@ -141,9 +141,10 @@ class AsyncServer extends \Thread implements ServerInterface
 
         // setup server bound on local adress
         $serverConnection = $socketType::getServerInstance(
-       		$connectionHandler, $serverConfig->getPort(), $serverConfig->getAddress()
+            $connectionHandler,
+            $serverConfig->getPort(),
+            $serverConfig->getAddress()
         );
-
 
         $logger->info(
             sprintf("%s listing on %s:%s...", $serverName, $serverConfig->getAddress(), $serverConfig->getPort())
