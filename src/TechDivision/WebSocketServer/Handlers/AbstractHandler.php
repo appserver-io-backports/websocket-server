@@ -23,6 +23,7 @@
 
 namespace TechDivision\WebSocketServer\Handlers;
 
+use TechDivision\WebSocketProtocol\Request;
 use TechDivision\WebSocketProtocol\Handler;
 use TechDivision\WebSocketProtocol\HandlerConfig;
 
@@ -62,6 +63,18 @@ abstract class AbstractHandler implements Handler
     }
 
     /**
+     * Injects the request instance when the connection has been created.
+     *
+     * @param \TechDivision\WebSocketProtocol\Request $request The request instance
+     *
+     * @return void
+     */
+    public function injectRequest(Request $request)
+    {
+        $this->request = $request;
+    }
+
+    /**
      * Return's the servlet's configuration.
      *
      * @return \TechDivision\WebSocketServer\Handlers\HandlerConfig The handler's configuration
@@ -79,5 +92,15 @@ abstract class AbstractHandler implements Handler
     public function getHandlerContext()
     {
         return $this->getHandlerConfig()->getHandlerContext();
+    }
+
+    /**
+     * Returns the request instance.
+     *
+     * @return \TechDivision\WebSocketProtocol\Request The request instance
+     */
+    public function getRequest()
+    {
+        return $this->request;
     }
 }
