@@ -97,8 +97,8 @@ class HandlerManager implements HandlerContext
      * Finds all handlers which are provided by the webapps and initializes them.
      *
      * @return void
-     * @throws \TechDivision\WebSocketContainer\InvalidHandlerClassException Is thrown if a no handler class has been defined in handler configuration
-     * @throws \TechDivision\WebSocketContainer\InvalidHandlerMappingException Is thrown if a no handler mapping relates to a invalid handler class
+     * @throws \TechDivision\WebSocketServer\InvalidHandlerClassException Is thrown if a no handler class has been defined in handler configuration
+     * @throws \TechDivision\WebSocketServer\InvalidHandlerMappingException Is thrown if a no handler mapping relates to a invalid handler class
      */
     protected function registerHandlers()
     {
@@ -202,7 +202,7 @@ class HandlerManager implements HandlerContext
      * Registers a handler under the passed key.
      *
      * @param string                                            $key     The key to register with the handler with
-     * @param \TechDivision\WebSocketContainer\Handlers\Handler $handler The handler to be registered
+     * @param \TechDivision\WebSocketServer\Handlers\Handler $handler The handler to be registered
      *
      * @return void
      */
