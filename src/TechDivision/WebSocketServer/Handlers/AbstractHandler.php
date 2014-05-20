@@ -50,6 +50,13 @@ abstract class AbstractHandler implements Handler
     protected $config;
 
     /**
+     * Current request on a handled connection
+     *
+     * @var \TechDivision\WebSocketProtocol\Request $request
+     */
+    protected $request;
+
+    /**
      * Initializes the handler with the passed configuration.
      *
      * @param \TechDivision\WebSocketProtocol\HandlerConfig $config The configuration to initialize the handler with
@@ -77,7 +84,7 @@ abstract class AbstractHandler implements Handler
     /**
      * Return's the servlet's configuration.
      *
-     * @return \TechDivision\WebSocketServer\Handlers\HandlerConfig The handler's configuration
+     * @return \TechDivision\WebSocketProtocol\HandlerConfig The handler's configuration
      */
     public function getHandlerConfig()
     {
