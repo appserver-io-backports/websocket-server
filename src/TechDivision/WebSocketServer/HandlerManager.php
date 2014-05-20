@@ -201,8 +201,13 @@ class HandlerManager implements HandlerContext
     /**
      * Registers a handler under the passed key.
      *
+<<<<<<< HEAD
      * @param string                                            $key     The key to register with the handler with
      * @param \TechDivision\WebSocketServer\Handlers\Handler $handler The handler to be registered
+=======
+     * @param string                                  $key     The key to register with the handler with
+     * @param \TechDivision\WebSocketProtocol\Handler $handler The handler to be registered
+>>>>>>> 5b2c6c5b8bdc796f350982e42408544f68f5c12b
      *
      * @return void
      */
