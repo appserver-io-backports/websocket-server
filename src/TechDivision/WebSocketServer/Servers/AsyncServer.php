@@ -130,7 +130,7 @@ class AsyncServer extends \Thread implements ServerInterface
             $connectionHandler->init($serverContext);
 
             // inject modules
-            $connectionHandler->injectModules($modules);
+            $connectionHandler->injectModules(array());
 
             // stop, because we only support one connection handler
             break;
@@ -139,11 +139,19 @@ class AsyncServer extends \Thread implements ServerInterface
         // get class names
         $socketType = $serverConfig->getSocketType();
 
-        // setup server bound on local adress
+        // setup server bound on local address
         $serverConnection = $socketType::getServerInstance(
             $connectionHandler,
             $serverConfig->getPort(),
             $serverConfig->getAddress()
+        );
+
+        // We have to notify the logical parent thread, the server script or containing container, as they have to
+        // know the port has been opened
+        $this->synchronized(
+            function () {
+                $this->notify();
+            }
         );
 
         $logger->info(
