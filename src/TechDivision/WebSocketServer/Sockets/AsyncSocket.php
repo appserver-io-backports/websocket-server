@@ -63,8 +63,6 @@ class AsyncSocket extends IoServer
      * @param MessageComponentInterface $app     The request handler instance
      * @param integer                   $port    The port to listen to
      * @param string                    $address The IP address to listen to
-     *
-     * @return void
      */
     public function __construct(MessageComponentInterface $app, $port, $address)
     {
