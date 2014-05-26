@@ -11,7 +11,7 @@
  *
  * PHP version 5
  *
- * @category   Webserver
+ * @category   Server
  * @package    TechDivision_WebSocketServer
  * @subpackage Sockets
  * @author     Tim Wagner <tw@techdivision.com>
@@ -32,7 +32,7 @@ use Ratchet\MessageComponentInterface;
  *
  * Events are delegated through this to attached applications.
  *
- * @category   Webserver
+ * @category   Server
  * @package    TechDivision_WebSocketServer
  * @subpackage Sockets
  * @author     Tim Wagner <tw@techdivision.com>
