@@ -11,7 +11,7 @@
  *
  * PHP version 5
  *
- * @category   Webserver
+ * @category   Server
  * @package    TechDivision_WebSocketServer
  * @subpackage Sockets
  * @author     Tim Wagner <tw@techdivision.com>
@@ -32,7 +32,7 @@ use Ratchet\MessageComponentInterface;
  *
  * Events are delegated through this to attached applications.
  *
- * @category   Webserver
+ * @category   Server
  * @package    TechDivision_WebSocketServer
  * @subpackage Sockets
  * @author     Tim Wagner <tw@techdivision.com>
@@ -63,8 +63,6 @@ class AsyncSocket extends IoServer
      * @param MessageComponentInterface $app     The request handler instance
      * @param integer                   $port    The port to listen to
      * @param string                    $address The IP address to listen to
-     *
-     * @return void
      */
     public function __construct(MessageComponentInterface $app, $port, $address)
     {

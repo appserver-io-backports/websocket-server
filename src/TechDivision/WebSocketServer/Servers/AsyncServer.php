@@ -11,7 +11,7 @@
  *
  * PHP version 5
  *
- * @category   Webserver
+ * @category   Server
  * @package    TechDivision_WebSocketServer
  * @subpackage Servers
  * @author     Tim Wagner <tw@techdivision.com>
@@ -22,19 +22,19 @@
 
 namespace TechDivision\WebSocketServer\Servers;
 
-use TechDivision\WebServer\Dictionaries\ModuleVars;
-use TechDivision\WebServer\Dictionaries\ServerVars;
-use TechDivision\WebServer\Interfaces\ServerConfigurationInterface;
-use TechDivision\WebServer\Interfaces\ServerContextInterface;
-use TechDivision\WebServer\Interfaces\ServerInterface;
-use TechDivision\WebServer\Interfaces\ConfigInterface;
-use TechDivision\WebServer\Exceptions\ModuleNotFoundException;
-use TechDivision\WebServer\Exceptions\ConnectionHandlerNotFoundException;
+use TechDivision\Server\Dictionaries\ModuleVars;
+use TechDivision\Server\Dictionaries\ServerVars;
+use TechDivision\Server\Interfaces\ServerConfigurationInterface;
+use TechDivision\Server\Interfaces\ServerContextInterface;
+use TechDivision\Server\Interfaces\ServerInterface;
+use TechDivision\Server\Interfaces\ConfigInterface;
+use TechDivision\Server\Exceptions\ModuleNotFoundException;
+use TechDivision\Server\Exceptions\ConnectionHandlerNotFoundException;
 
 /**
  * A asynchronous server implementation based on Ratchet.
  *
- * @category   Webserver
+ * @category   Server
  * @package    TechDivision_WebSocketServer
  * @subpackage Servers
  * @author     Tim Wagner <tw@techdivision.com>
@@ -48,14 +48,14 @@ class AsyncServer extends \Thread implements ServerInterface
     /**
      * Hold's the server context instance
      *
-     * @var \TechDivision\WebServer\Interfaces\ServerContextInterface The server context instance
+     * @var \TechDivision\Server\Interfaces\ServerContextInterface The server context instance
      */
     protected $serverContext;
 
     /**
      * Constructs the server instance
      *
-     * @param \TechDivision\WebServer\Interfaces\ServerContextInterface $serverContext The server context instance
+     * @param \TechDivision\Server\Interfaces\ServerContextInterface $serverContext The server context instance
      */
     public function __construct(ServerContextInterface $serverContext)
     {
@@ -68,7 +68,7 @@ class AsyncServer extends \Thread implements ServerInterface
     /**
      * Return's the config instance
      *
-     * @return \TechDivision\WebServer\Interfaces\ServerContextInterface
+     * @return \TechDivision\Server\Interfaces\ServerContextInterface
      */
     public function getServerContext()
     {
@@ -80,16 +80,16 @@ class AsyncServer extends \Thread implements ServerInterface
      *
      * @return void
      *
-     * @throws \TechDivision\WebServer\Exceptions\ModuleNotFoundException
-     * @throws \TechDivision\WebServer\Exceptions\ConnectionHandlerNotFoundException
+     * @throws \TechDivision\Server\Exceptions\ModuleNotFoundException
+     * @throws \TechDivision\Server\Exceptions\ConnectionHandlerNotFoundException
      */
     public function run()
     {
         // set current dir to base dir for relative dirs
-        chdir(WEBSERVER_BASEDIR);
+        chdir(SERVER_BASEDIR);
 
         // setup autoloader
-        require WEBSERVER_AUTOLOADER;
+        require SERVER_AUTOLOADER;
 
         // init server context
         $serverContext = $this->getServerContext();
@@ -130,7 +130,7 @@ class AsyncServer extends \Thread implements ServerInterface
             $connectionHandler->init($serverContext);
 
             // inject modules
-            $connectionHandler->injectModules($modules);
+            $connectionHandler->injectModules(array());
 
             // stop, because we only support one connection handler
             break;
@@ -148,6 +148,14 @@ class AsyncServer extends \Thread implements ServerInterface
             $connectionHandler,
             $serverConfig->getPort(),
             $serverConfig->getAddress()
+        );
+
+        // We have to notify the logical parent thread, the server script or containing container, as they have to
+        // know the port has been opened
+        $this->synchronized(
+            function () {
+                $this->notify();
+            }
         );
 
         $logger->info(
