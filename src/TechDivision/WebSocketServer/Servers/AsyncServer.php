@@ -139,11 +139,15 @@ class AsyncServer extends \Thread implements ServerInterface
         // get class names
         $socketType = $serverConfig->getSocketType();
 
-        // setup server bound on local address
+        // setup server bound on local adress
         $serverConnection = $socketType::getServerInstance(
             $connectionHandler,
             $serverConfig->getPort(),
             $serverConfig->getAddress()
+        );
+
+        $logger->debug(
+            sprintf("%s started socket (%s)", $serverName, $socketType)
         );
 
         // We have to notify the logical parent thread, the server script or containing container, as they have to
