@@ -23,6 +23,7 @@
 namespace TechDivision\WebSocketServer;
 
 use Ratchet\MessageComponentInterface;
+use TechDivision\WebSocketProtocol\Request;
 use TechDivision\WebSocketProtocol\Handler;
 use TechDivision\WebSocketProtocol\HandlerContext;
 use TechDivision\WebContainer\Exceptions\InvalidApplicationArchiveException;
@@ -312,6 +313,6 @@ class HandlerManager implements HandlerContext
      */
     public function locate(Request $request)
     {
-        $this->getHandlerLocator()->locate($this, $request);
+        return $this->getHandlerLocator()->locate($this, $request);
     }
 }
