@@ -8,3 +8,5 @@
 /doc/build
 # the apple directory description
 .DS_Store
+/vendor
+/composer.lock

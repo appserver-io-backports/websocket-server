@@ -26,7 +26,6 @@ use Ratchet\MessageComponentInterface;
 use TechDivision\WebSocketProtocol\Request;
 use TechDivision\WebSocketProtocol\Handler;
 use TechDivision\WebSocketProtocol\HandlerContext;
-use TechDivision\WebContainer\Exceptions\InvalidApplicationArchiveException;
 
 /**
  * The handler manager handles the handlers registered for the application.
@@ -66,7 +65,7 @@ class HandlerManager implements HandlerContext
     /**
      * The resource locator used to locate the servlet that matches the actual request.
      *
-     * @var \TechDivision\WebSocketCServer\HandlerLocator
+     * @var \TechDivision\WebSocketServer\HandlerLocator
      */
     protected $handlerLocator;
 
