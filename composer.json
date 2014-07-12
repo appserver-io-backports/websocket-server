@@ -7,7 +7,7 @@
         "php" : ">=5.4.0",
         "techdivision/websocketprotocol" : "0.1.*",
         "techdivision/server" : "0.1.*",
-        "cboden/ratchet": "0.3.*",
+        "cboden/ratchet": "0.2.*",
         "react/event-loop": "0.4.*",
         "react/socket": "0.4.*"
     },
