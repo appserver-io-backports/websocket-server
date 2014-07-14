@@ -23,6 +23,8 @@
 namespace TechDivision\WebSocketServer;
 
 use Ratchet\MessageComponentInterface;
+use TechDivision\Storage\GenericStackable;
+use TechDivision\Storage\StackableStorage;
 use TechDivision\WebSocketProtocol\Request;
 use TechDivision\WebSocketProtocol\Handler;
 use TechDivision\WebSocketProtocol\HandlerContext;
@@ -38,43 +40,25 @@ use TechDivision\WebSocketProtocol\HandlerContext;
  * @link      https://github.com/techdivision/TechDivision_WebSocketServer
  * @link      http://www.appserver.io
  */
-class HandlerManager implements HandlerContext
+class HandlerManager extends GenericStackable implements HandlerContext
 {
 
     /**
-     * Array with web socket handlers handled by this manager.
+     * Initializes the handler manager.
      *
-     * @var array
+     * @return void
      */
-    protected $handlers = array();
+    public function __construct()
+    {
+        // initialize the member variables
+        $this->webappPath = '';
+        $this->handlerLocator = null;
 
-    /**
-     * Array that contains the handler mappings
-     *
-     * @var array
-     */
-    protected $handlerMappings = array();
-
-    /**
-     * The absolute path to the web application.
-     *
-     * @var string
-     */
-    protected $webappPath;
-
-    /**
-     * The resource locator used to locate the servlet that matches the actual request.
-     *
-     * @var \TechDivision\WebSocketServer\HandlerLocator
-     */
-    protected $handlerLocator;
-
-    /**
-     * Array with the handler's init parameters found in the handler.xml configuration file.
-     *
-     * @var array
-    */
-    protected $initParameter = array();
+        // initialize the stackabls
+        $this->handlers = new GenericStackable();
+        $this->handlerMappings = new GenericStackable();
+        $this->initParameters = new GenericStackable();
+    }
 
     /**
      * Injects the absolute path to the web application.
@@ -196,9 +180,9 @@ class HandlerManager implements HandlerContext
     }
 
     /**
-     * Set's the array with all registered handlers.
+     * Sets the registered handlers.
      *
-     * @param array $handler An array with the web socket handlers to be registered
+     * @param \TechDivision\Storage\GenericStackable $handler An array with the web socket handlers to be registered
      *
      * @return void
      */
@@ -208,9 +192,9 @@ class HandlerManager implements HandlerContext
     }
 
     /**
-     * Return's the array with all registered handlers.
+     * Returns the registered handlers.
      *
-     * @return array An array with the initialized web socket handlers
+     * @return \TechDivision\Storage\GenericStackable The initialized web socket handlers
      */
     public function getHandlers()
     {
@@ -313,5 +297,28 @@ class HandlerManager implements HandlerContext
     public function locate(Request $request)
     {
         return $this->getHandlerLocator()->locate($this, $request);
+    }
+
+    /**
+     * Initializes the manager instance.
+     *
+     * @return void
+     * @see \TechDivision\Application\Interfaces\ManagerInterface::initialize()
+     */
+    public function getIdentifier()
+    {
+        return HandlerContext::IDENTIFIER;
+    }
+
+    /**
+     * Returns the value with the passed name from the context.
+     *
+     * @param string $key The key of the value to return from the context.
+     *
+     * @return mixed The requested attribute
+     */
+    public function getAttribute($key)
+    {
+        throw new \Exception(sprintf('%s is not implemented yes', __METHOD__));
     }
 }
