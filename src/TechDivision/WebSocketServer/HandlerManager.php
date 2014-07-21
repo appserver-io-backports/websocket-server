@@ -28,6 +28,7 @@ use TechDivision\Storage\StackableStorage;
 use TechDivision\WebSocketProtocol\Request;
 use TechDivision\WebSocketProtocol\Handler;
 use TechDivision\WebSocketProtocol\HandlerContext;
+use TechDivision\Application\Interfaces\ApplicationInterface;
 
 /**
  * The handler manager handles the handlers registered for the application.
@@ -88,12 +89,14 @@ class HandlerManager extends GenericStackable implements HandlerContext
      * Has been automatically invoked by the container after the application
      * instance has been created.
      *
-     * @return \TechDivision\WebContainer\WebApplication The connected application
+     * @param \TechDivision\Application\Interfaces\ApplicationInterface $application The application instance
+     *
+     * @return void
+     * @see \TechDivision\Application\Interfaces\ManagerInterface::initialize()
      */
-    public function initialize()
+    public function initialize(ApplicationInterface $application)
     {
         $this->registerHandlers();
-        return $this;
     }
 
     /**
@@ -320,5 +323,28 @@ class HandlerManager extends GenericStackable implements HandlerContext
     public function getAttribute($key)
     {
         throw new \Exception(sprintf('%s is not implemented yes', __METHOD__));
+    }
+
+    /**
+     * Factory method that adds a initialized manager instance to the passed application.
+     *
+     * @param \TechDivision\Application\Interfaces\ApplicationInterface $application The application instance
+     *
+     * @return void
+     * @see \TechDivision\Application\Interfaces\ManagerInterface::get()
+     */
+    public static function get(ApplicationInterface $application)
+    {
+
+        // initialize the handler locator
+        $handlerLocator = new HandlerLocator();
+
+        // initialize the handler manager
+        $handlerManager = new HandlerManager();
+        $handlerManager->injectWebappPath($application->getWebappPath());
+        $handlerManager->injectHandlerLocator($handlerLocator);
+
+        // add the manager instance to the application
+        $application->addManager($handlerManager);
     }
 }
