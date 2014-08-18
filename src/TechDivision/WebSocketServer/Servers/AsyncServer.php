@@ -24,10 +24,10 @@ namespace TechDivision\WebSocketServer\Servers;
 
 use TechDivision\Server\Dictionaries\ModuleVars;
 use TechDivision\Server\Dictionaries\ServerVars;
+use TechDivision\Server\Dictionaries\ServerStateKeys;
 use TechDivision\Server\Interfaces\ServerConfigurationInterface;
 use TechDivision\Server\Interfaces\ServerContextInterface;
 use TechDivision\Server\Interfaces\ServerInterface;
-use TechDivision\Server\Interfaces\ConfigInterface;
 use TechDivision\Server\Exceptions\ModuleNotFoundException;
 use TechDivision\Server\Exceptions\ConnectionHandlerNotFoundException;
 
@@ -53,12 +53,21 @@ class AsyncServer extends \Thread implements ServerInterface
     protected $serverContext;
 
     /**
+     * TRUE if the server has been started successfully, else FALSE.
+     *
+     * @var \TechDivision\Server\Dictionaries\ServerStateKeys
+     */
+    protected $serverState;
+
+    /**
      * Constructs the server instance
      *
      * @param \TechDivision\Server\Interfaces\ServerContextInterface $serverContext The server context instance
      */
     public function __construct(ServerContextInterface $serverContext)
     {
+        // initialize the server state
+        $this->serverState = ServerStateKeys::get(ServerStateKeys::WAITING_FOR_INITIALIZATION);
         // set context
         $this->serverContext = $serverContext;
         // start server thread
@@ -107,6 +116,9 @@ class AsyncServer extends \Thread implements ServerInterface
             sprintf("starting %s (%s)", $serverName, __CLASS__)
         );
 
+        // initialization has been successful
+        $this->serverState = ServerStateKeys::get(ServerStateKeys::INITIALIZATION_SUCCESSFUL);
+
         // initialize the connection handler
         $connectionHandler = null;
 
@@ -150,13 +162,8 @@ class AsyncServer extends \Thread implements ServerInterface
             sprintf("%s started socket (%s)", $serverName, $socketType)
         );
 
-        // We have to notify the logical parent thread, the server script or containing container, as they have to
-        // know the port has been opened
-        $this->synchronized(
-            function () {
-                $this->notify();
-            }
-        );
+        // sockets has been started
+        $this->serverState = ServerStateKeys::get(ServerStateKeys::SERVER_SOCKET_STARTED);
 
         $logger->info(
             sprintf("%s listing on %s:%s...", $serverName, $serverConfig->getAddress(), $serverConfig->getPort())

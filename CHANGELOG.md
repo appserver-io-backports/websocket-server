@@ -1,3 +1,13 @@
+# Version 0.3.2
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Replace container notify() call with member variable that holds the server state
+
 # Version 0.3.1
 
 ## Bugfixes
