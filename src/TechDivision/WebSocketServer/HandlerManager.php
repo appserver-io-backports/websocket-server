@@ -29,6 +29,7 @@ use TechDivision\WebSocketProtocol\Request;
 use TechDivision\WebSocketProtocol\Handler;
 use TechDivision\WebSocketProtocol\HandlerContext;
 use TechDivision\Application\Interfaces\ApplicationInterface;
+use TechDivision\Application\Interfaces\ManagerConfigurationInterface;
 
 /**
  * The handler manager handles the handlers registered for the application.
@@ -326,14 +327,15 @@ class HandlerManager extends GenericStackable implements HandlerContext
     }
 
     /**
-     * Factory method that adds a initialized manager instance to the passed application.
+     * Visitor method that adds a initialized manager instance to the passed application.
      *
-     * @param \TechDivision\Application\Interfaces\ApplicationInterface $application The application instance
+     * @param \TechDivision\Application\Interfaces\ApplicationInterface               $application          The application instance
+     * @param \TechDivision\Application\Interfaces\ManagerConfigurationInterface|null $managerConfiguration The manager configuration
      *
      * @return void
      * @see \TechDivision\Application\Interfaces\ManagerInterface::get()
      */
-    public static function get(ApplicationInterface $application)
+    public static function visit(ApplicationInterface $application, ManagerConfigurationInterface $managerConfiguration = null)
     {
 
         // initialize the handler locator
@@ -344,7 +346,7 @@ class HandlerManager extends GenericStackable implements HandlerContext
         $handlerManager->injectWebappPath($application->getWebappPath());
         $handlerManager->injectHandlerLocator($handlerLocator);
 
-        // add the manager instance to the application
+        // add the initialized manager instance to the application
         $application->addManager($handlerManager);
     }
 }
