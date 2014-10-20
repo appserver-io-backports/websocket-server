@@ -1,3 +1,13 @@
+# Version 0.3.4
+
+## Bugfixes
+
+* Inject all Stackable instances instead of initialize them in HandlerManager::__construct => pthreads 2.x compatibility
+
+## Features
+
+* None
+
 # Version 0.3.3
 
 ## Bugfixes
