@@ -87,6 +87,42 @@ class HandlerManager extends GenericStackable implements HandlerContext
     }
 
     /**
+     * Injects the registered web socket handlers.
+     *
+     * @param \TechDivision\Storage\GenericStackable $handlers An storage for the web socket handlers
+     *
+     * @return void
+     */
+    public function injectHandlers(GenericStackable $handlers)
+    {
+        $this->handlers = $handlers;
+    }
+
+    /**
+     * Injects the handler mappings.
+     *
+     * @param \TechDivision\Storage\GenericStackable $handlerMappings An storage for the handler mappings
+     *
+     * @return void
+     */
+    public function injectHandlerMappings(GenericStackable $handlerMappings)
+    {
+        $this->handlerMappings = $handlerMappings;
+    }
+
+    /**
+     * Injects the initialization parameters.
+     *
+     * @param \TechDivision\Storage\GenericStackable $initParameters An storage for the initialization parameters
+     *
+     * @return void
+     */
+    public function injectInitParameters(GenericStackable $initParameters)
+    {
+        $this->initParameters = $initParameters;
+    }
+
+    /**
      * Has been automatically invoked by the container after the application
      * instance has been created.
      *
@@ -181,18 +217,6 @@ class HandlerManager extends GenericStackable implements HandlerContext
                 $this->handlerMappings['/' . $urlPattern] = (string) $mapping->{'handler-name'};
             }
         }
-    }
-
-    /**
-     * Sets the registered handlers.
-     *
-     * @param \TechDivision\Storage\GenericStackable $handler An array with the web socket handlers to be registered
-     *
-     * @return void
-     */
-    public function setHandlers($handler)
-    {
-        $this->handlers = $handler;
     }
 
     /**
@@ -338,11 +362,19 @@ class HandlerManager extends GenericStackable implements HandlerContext
     public static function visit(ApplicationInterface $application, ManagerConfigurationInterface $managerConfiguration = null)
     {
 
+        // initialize the stackabls
+        $handlers = new GenericStackable();
+        $handlerMappings = new GenericStackable();
+        $initParameters = new GenericStackable();
+
         // initialize the handler locator
         $handlerLocator = new HandlerLocator();
 
         // initialize the handler manager
         $handlerManager = new HandlerManager();
+        $handlerManager->injectHandlers($handlers);
+        $handlerManager->injectHandlerMappings($handlerMappings);
+        $handlerManager->injectInitParameters($initParameters);
         $handlerManager->injectWebappPath($application->getWebappPath());
         $handlerManager->injectHandlerLocator($handlerLocator);
 
