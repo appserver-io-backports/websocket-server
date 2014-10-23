@@ -1,3 +1,13 @@
+# Version 0.4.0
+
+## Bugfixes
+
+* Integration to initialize manager instances with thread based factories
+
+## Features
+
+* None
+
 # Version 0.3.4
 
 ## Bugfixes
