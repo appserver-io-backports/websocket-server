@@ -29,7 +29,6 @@ use TechDivision\WebSocketProtocol\Request;
 use TechDivision\WebSocketProtocol\Handler;
 use TechDivision\WebSocketProtocol\HandlerContext;
 use TechDivision\Application\Interfaces\ApplicationInterface;
-use TechDivision\Application\Interfaces\ManagerConfigurationInterface;
 
 /**
  * The handler manager handles the handlers registered for the application.
@@ -348,37 +347,5 @@ class HandlerManager extends GenericStackable implements HandlerContext
     public function getAttribute($key)
     {
         throw new \Exception(sprintf('%s is not implemented yes', __METHOD__));
-    }
-
-    /**
-     * Visitor method that adds a initialized manager instance to the passed application.
-     *
-     * @param \TechDivision\Application\Interfaces\ApplicationInterface               $application          The application instance
-     * @param \TechDivision\Application\Interfaces\ManagerConfigurationInterface|null $managerConfiguration The manager configuration
-     *
-     * @return void
-     * @see \TechDivision\Application\Interfaces\ManagerInterface::get()
-     */
-    public static function visit(ApplicationInterface $application, ManagerConfigurationInterface $managerConfiguration = null)
-    {
-
-        // initialize the stackabls
-        $handlers = new GenericStackable();
-        $handlerMappings = new GenericStackable();
-        $initParameters = new GenericStackable();
-
-        // initialize the handler locator
-        $handlerLocator = new HandlerLocator();
-
-        // initialize the handler manager
-        $handlerManager = new HandlerManager();
-        $handlerManager->injectHandlers($handlers);
-        $handlerManager->injectHandlerMappings($handlerMappings);
-        $handlerManager->injectInitParameters($initParameters);
-        $handlerManager->injectWebappPath($application->getWebappPath());
-        $handlerManager->injectHandlerLocator($handlerLocator);
-
-        // add the initialized manager instance to the application
-        $application->addManager($handlerManager);
     }
 }
