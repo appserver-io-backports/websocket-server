@@ -1,3 +1,13 @@
+# Version 0.4.1
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Revert integration to initialize manager instances with thread based factories
+
 # Version 0.4.0
 
 ## Bugfixes

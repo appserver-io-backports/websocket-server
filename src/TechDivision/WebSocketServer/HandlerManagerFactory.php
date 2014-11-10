@@ -23,7 +23,8 @@
 namespace TechDivision\WebSocketServer;
 
 use TechDivision\Storage\GenericStackable;
-use TechDivision\ApplicationServer\AbstractManagerFactory;
+use TechDivision\Application\Interfaces\ApplicationInterface;
+use TechDivision\Application\Interfaces\ManagerConfigurationInterface;
 
 /**
  * The handler manager handles the handlers registered for the application.
@@ -36,52 +37,37 @@ use TechDivision\ApplicationServer\AbstractManagerFactory;
  * @link      https://github.com/techdivision/TechDivision_WebSocketServer
  * @link      http://www.appserver.io
  */
-class HandlerManagerFactory extends AbstractManagerFactory
+class HandlerManagerFactory
 {
 
     /**
      * The main method that creates new instances in a separate context.
      *
+     * @param \TechDivision\Application\Interfaces\ApplicationInterface          $application          The application instance to register the class loader with
+     * @param \TechDivision\Application\Interfaces\ManagerConfigurationInterface $managerConfiguration The manager configuration
+     *
      * @return void
      */
-    public function run()
+    public static function visit(ApplicationInterface $application, ManagerConfigurationInterface $managerConfiguration)
     {
 
-        while (true) { // we never stop
+        // initialize the stackabls
+        $handlers = new GenericStackable();
+        $handlerMappings = new GenericStackable();
+        $initParameters = new GenericStackable();
 
-            $this->synchronized(function ($self) {
+        // initialize the handler locator
+        $handlerLocator = new HandlerLocator();
 
-                // make instances local available
-                $instances = $self->instances;
-                $application = $self->application;
-                $initialContext = $self->initialContext;
+        // initialize the handler manager
+        $handlerManager = new HandlerManager();
+        $handlerManager->injectHandlers($handlers);
+        $handlerManager->injectHandlerMappings($handlerMappings);
+        $handlerManager->injectInitParameters($initParameters);
+        $handlerManager->injectWebappPath($application->getWebappPath());
+        $handlerManager->injectHandlerLocator($handlerLocator);
 
-                // register the default class loader
-                $initialContext->getClassLoader()->register(true, true);
-
-                // initialize the stackabls
-                $handlers = new GenericStackable();
-                $handlerMappings = new GenericStackable();
-                $initParameters = new GenericStackable();
-
-                // initialize the handler locator
-                $handlerLocator = new HandlerLocator();
-
-                // initialize the handler manager
-                $handlerManager = new HandlerManager();
-                $handlerManager->injectHandlers($handlers);
-                $handlerManager->injectHandlerMappings($handlerMappings);
-                $handlerManager->injectInitParameters($initParameters);
-                $handlerManager->injectWebappPath($application->getWebappPath());
-                $handlerManager->injectHandlerLocator($handlerLocator);
-
-                // attach the instance
-                $instances[] = $handlerManager;
-
-                // wait for the next instance to be created
-                $self->wait();
-
-            }, $this);
-        }
+        // attach the instance
+        $application->addManager($handlerManager);
     }
 }
