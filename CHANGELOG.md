@@ -1,3 +1,13 @@
+# Version 0.4.2
+
+## Bugfixes
+
+* None
+
+## Features
+
+* Add manager configuration to factory method
+
 # Version 0.4.1
 
 ## Bugfixes
