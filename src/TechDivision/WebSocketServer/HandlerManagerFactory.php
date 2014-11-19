@@ -68,6 +68,6 @@ class HandlerManagerFactory
         $handlerManager->injectHandlerLocator($handlerLocator);
 
         // attach the instance
-        $application->addManager($handlerManager);
+        $application->addManager($handlerManager, $managerConfiguration);
     }
 }
